@@ -33,6 +33,17 @@ This document explains how to set up the Terms & Conditions Discord bot to start
 | `./manage.sh logs-tail` | Show last 50 log lines |
 | `./manage.sh uninstall` | Remove service and disable auto-start |
 
+## Ecosystem Management
+
+For managing both Terms & Conditions and Xedge together:
+
+```bash
+# From anywhere on the system
+/mnt/hedger/xedge-ecosystem.sh install-all   # Install both services
+/mnt/hedger/xedge-ecosystem.sh start-all     # Start both services
+/mnt/hedger/xedge-ecosystem.sh stop-all      # Stop both services
+/mnt/hedger/xedge-ecosystem.sh status-all    # Check both services
+```
 ## Service Details
 
 - **Service Name:** `terms-and-conditions`
