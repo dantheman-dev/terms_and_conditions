@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 from terms.config import Settings
@@ -48,7 +50,7 @@ async def on_interaction(interaction: discord.Interaction):
     method = "dm_button" if isinstance(interaction.channel, discord.DMChannel) else "channel_button"
 
     if cid == "terms:consent:agree":
-        record_consent(guild.id, member.id, method=method)
+        await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
         granted = await grant_sharps(member)
         msg = ("✅ Agreed. **Sharps** role granted. You can use Xedge now."
                if granted else
