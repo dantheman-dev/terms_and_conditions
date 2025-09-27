@@ -1,0 +1,28 @@
+[Unit]
+Description=Terms and Conditions Discord Bot
+After=network.target
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=vega
+Group=vega
+WorkingDirectory=/mnt/hedger/terms_and_conditions
+Environment=PATH=/mnt/hedger/terms_and_conditions/.venv/bin
+ExecStart=/mnt/hedger/terms_and_conditions/.venv/bin/python bot.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=terms-and-conditions
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/mnt/hedger/terms_and_conditions
+
+[Install]
+WantedBy=multi-user.target
