@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# Virtual env
+.venv/
+.venv*/        # any variant
+
+# Local config & DBs
+.env
+*.sqlite
+consent.db
+
+# Editors/OS
+.vscode/
+.DS_Store
+*.swp
+*.swo
