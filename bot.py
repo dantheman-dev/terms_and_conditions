@@ -20,7 +20,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def setup_hook():
-    Base.metadata.create_all(ENGINE)
+    await asyncio.to_thread(Base.metadata.create_all, ENGINE)
     await bot.load_extension("terms.cogs.onboarding")
 
     guild_obj = discord.Object(id=settings.GUILD_ID)
