@@ -16,5 +16,21 @@ Grants/removes the **Sharps** role after explicit user consent and records a sig
 5. `python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
 6. `python bot.py` to run in foreground.
 
-## Systemd
-See service section in the guide.
+## Production Deployment (Auto-start on boot)
+
+### Install as systemd service:
+```bash
+./manage.sh install    # Install and enable auto-start
+./manage.sh start      # Start the service
+./manage.sh status     # Check status
+./manage.sh logs       # View live logs
+```
+
+### Ecosystem management (with Xedge):
+```bash
+/mnt/hedger/xedge-ecosystem.sh install-all   # Install both services
+/mnt/hedger/xedge-ecosystem.sh start-all     # Start both services
+/mnt/hedger/xedge-ecosystem.sh status-all    # Check both services
+```
+
+See [SERVICE_SETUP.md](SERVICE_SETUP.md) for detailed service management instructions.
