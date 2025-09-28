@@ -34,3 +34,7 @@ Grants/removes the **Sharps** role after explicit user consent and records a sig
 ```
 
 See [SERVICE_SETUP.md](SERVICE_SETUP.md) for detailed service management instructions.
+
+## Verification notes
+
+- DM button consent flow: trigger `/start` in a DM or click the consent button from a DM card. Confirm the bot logs `interaction.dm_button_resolved` and that the consent response is delivered via DM.

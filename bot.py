@@ -42,12 +42,78 @@ async def on_interaction(interaction: discord.Interaction):
         return
 
     guild = interaction.guild
+    if guild is None:
+        guild = bot.get_guild(settings.GUILD_ID)
+        if guild:
+            log.debug(
+                "interaction.guild_resolved_from_cache id=%s guild=%s",
+                interaction.id,
+                guild.id,
+            )
+    if guild is None:
+        try:
+            guild = await bot.fetch_guild(settings.GUILD_ID)
+        except discord.HTTPException as exc:
+            log.warning(
+                "interaction.guild_fetch_failed id=%s guild=%s exc=%s",
+                interaction.id,
+                settings.GUILD_ID,
+                exc,
+            )
+        else:
+            log.info(
+                "interaction.guild_resolved_via_fetch id=%s guild=%s",
+                interaction.id,
+                guild.id,
+            )
+
     member = interaction.user if isinstance(interaction.user, discord.Member) else None
+    if member is None and guild is not None:
+        member = guild.get_member(interaction.user.id)
+        if member:
+            log.debug(
+                "interaction.member_resolved_from_cache id=%s guild=%s member=%s",
+                interaction.id,
+                guild.id,
+                member.id,
+            )
+    if member is None and guild is not None:
+        try:
+            member = await guild.fetch_member(interaction.user.id)
+        except discord.HTTPException as exc:
+            log.warning(
+                "interaction.member_fetch_failed id=%s guild=%s user=%s exc=%s",
+                interaction.id,
+                guild.id if guild else "?",
+                interaction.user.id,
+                exc,
+            )
+        else:
+            log.info(
+                "interaction.member_resolved_via_fetch id=%s guild=%s member=%s",
+                interaction.id,
+                guild.id,
+                member.id,
+            )
+
     if not guild or not member:
         await interaction.response.send_message("Guild/member missing.", ephemeral=True)
+        log.error(
+            "interaction.guild_or_member_missing id=%s guild=%s user=%s",
+            interaction.id,
+            getattr(guild, "id", None),
+            interaction.user.id,
+        )
         return
 
     method = "dm_button" if isinstance(interaction.channel, discord.DMChannel) else "channel_button"
+    if method == "dm_button":
+        log.info(
+            "interaction.dm_button_resolved id=%s guild=%s member=%s",
+            interaction.id,
+            guild.id,
+            member.id,
+        )
 
     if cid == "terms:consent:agree":
         await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
