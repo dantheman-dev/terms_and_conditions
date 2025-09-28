@@ -27,6 +27,7 @@ class Settings:
 
         self.DISCORD_TOKEN: str = self._require("DISCORD_TOKEN")
         self.GUILD_ID: int = self._require_int("GUILD_ID")
+        self.SHARPS_ROLE_ID: int | None = self._optional_int("SHARPS_ROLE_ID")
         self.SHARPS_ROLE_NAME: str = os.getenv("SHARPS_ROLE_NAME", "Sharps")
         self.DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./consent.db")
         self.LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
@@ -50,6 +51,17 @@ class Settings:
     @classmethod
     def _require_int(cls, key: str) -> int:
         raw = cls._require(key)
+        try:
+            return int(raw)
+        except ValueError as exc:  # pragma: no cover - defensive programming
+            raise RuntimeError(f"Expected integer value for {key!r}") from exc
+
+    @classmethod
+    def _optional_int(cls, key: str) -> int | None:
+        raw = os.getenv(key)
+        if raw is None or raw == "":
+            return None
+
         try:
             return int(raw)
         except ValueError as exc:  # pragma: no cover - defensive programming

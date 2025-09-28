@@ -116,13 +116,18 @@ async def on_interaction(interaction: discord.Interaction):
         )
 
     if cid == "terms:consent:agree":
-        await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
+        created = await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
         granted = await grant_sharps(member)
         msg = ("✅ Agreed. **Sharps** role granted. You can use Xedge now."
                if granted else
                "✅ Agreed, but admin must fix role: **Sharps** missing or bot role below Sharps.")
         await interaction.response.send_message(msg, ephemeral=True)
-        log.info("consent.accepted guild=%s user=%s", guild.id, member.id)
+        log.info(
+            "consent.accepted guild=%s user=%s consent_recorded=%s",
+            guild.id,
+            member.id,
+            created,
+        )
     else:
         await remove_sharps(member)
         await interaction.response.send_message(

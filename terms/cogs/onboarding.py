@@ -9,10 +9,16 @@ AGREE_ID   = "terms:consent:agree"
 DECLINE_ID = "terms:consent:decline"
 
 class ConsentView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.add_item(discord.ui.Button(label="I Agree",  style=discord.ButtonStyle.success, custom_id=AGREE_ID))
-        self.add_item(discord.ui.Button(label="Decline", style=discord.ButtonStyle.danger,  custom_id=DECLINE_ID))
+    """Interactive consent card for onboarding."""
+
+    def __init__(self, *, persistent: bool = False):
+        super().__init__(timeout=None if persistent else 180)
+        self.add_item(
+            discord.ui.Button(label="I Agree", style=discord.ButtonStyle.success, custom_id=AGREE_ID)
+        )
+        self.add_item(
+            discord.ui.Button(label="Decline", style=discord.ButtonStyle.danger, custom_id=DECLINE_ID)
+        )
 
 class Onboarding(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -33,4 +39,4 @@ class Onboarding(commands.Cog):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Onboarding(bot))
-    bot.add_view(ConsentView())  # persistent view
+    bot.add_view(ConsentView(persistent=True))  # persistent view
