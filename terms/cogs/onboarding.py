@@ -1,9 +1,8 @@
 import discord
-from discord.ext import commands
 from discord import app_commands
+from discord.ext import commands
+
 from terms.constants import CONSENT_TEXT
-from terms.consent import record_consent
-from terms.roles import grant_sharps, remove_sharps
 
 AGREE_ID   = "terms:consent:agree"
 DECLINE_ID = "terms:consent:decline"

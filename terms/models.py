@@ -1,8 +1,10 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime, UniqueConstraint
-from datetime import datetime, timezone
+from datetime import datetime
 
-class Base(DeclarativeBase): pass
+from sqlalchemy import DateTime, Integer, String, UniqueConstraint
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+class Base(DeclarativeBase):
+    pass
 
 class UserConsent(Base):
     __tablename__ = "user_consents"
