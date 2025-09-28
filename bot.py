@@ -116,12 +116,40 @@ async def on_interaction(interaction: discord.Interaction):
         )
 
     if cid == "terms:consent:agree":
-        created = await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
-        granted = await grant_sharps(member)
-        msg = ("✅ Agreed. **Sharps** role granted. You can use Xedge now."
-               if granted else
-               "✅ Agreed, but admin must fix role: **Sharps** missing or bot role below Sharps.")
-        await interaction.response.send_message(msg, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+        created = False
+        granted = False
+        followup_message: str | None = None
+
+        try:
+            created = await asyncio.to_thread(record_consent, guild.id, member.id, method=method)
+        except Exception:
+            log.exception(
+                "consent.record_failed guild=%s user=%s", guild.id, member.id
+            )
+            followup_message = (
+                "⚠️ We couldn't record your agreement due to an internal error. Please try again."
+            )
+
+        if followup_message is None:
+            try:
+                granted = await grant_sharps(member)
+            except Exception:
+                log.exception(
+                    "consent.role_grant_failed guild=%s user=%s", guild.id, member.id
+                )
+                followup_message = (
+                    "⚠️ Agreed, but there was an error applying **Sharps**. Please contact an admin."
+                )
+
+        if followup_message is None:
+            followup_message = (
+                "✅ Agreed. **Sharps** role granted. You can use Xedge now."
+                if granted
+                else "✅ Agreed, but admin must fix role: **Sharps** missing or bot role below Sharps."
+            )
+
+        await interaction.followup.send(followup_message, ephemeral=True)
         log.info(
             "consent.accepted guild=%s user=%s consent_recorded=%s",
             guild.id,
@@ -129,11 +157,21 @@ async def on_interaction(interaction: discord.Interaction):
             created,
         )
     else:
-        await remove_sharps(member)
-        await interaction.response.send_message(
-            "❌ Understood. Without agreement, **Sharps** won’t be granted. Run `/start` anytime.",
-            ephemeral=True
+        await interaction.response.defer(ephemeral=True)
+        followup_message = (
+            "❌ Understood. Without agreement, **Sharps** won’t be granted. Run `/start` anytime."
         )
+        try:
+            await remove_sharps(member)
+        except Exception:
+            log.exception(
+                "consent.role_remove_failed guild=%s user=%s", guild.id, member.id
+            )
+            followup_message = (
+                "⚠️ We couldn't remove **Sharps** due to an internal error. Please contact an admin."
+            )
+
+        await interaction.followup.send(followup_message, ephemeral=True)
         log.info("consent.declined guild=%s user=%s", guild.id, member.id)
 
 if __name__ == "__main__":
