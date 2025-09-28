@@ -10,7 +10,7 @@ DECLINE_ID = "terms:consent:decline"
 class ConsentView(discord.ui.View):
     """Interactive consent card for onboarding."""
 
-    def __init__(self, *, persistent: bool = False):
+    def __init__(self, *, persistent: bool = True):
         super().__init__(timeout=None if persistent else 180)
         self.add_item(
             discord.ui.Button(label="I Agree", style=discord.ButtonStyle.success, custom_id=AGREE_ID)
@@ -27,14 +27,18 @@ class Onboarding(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         try:
             embed = discord.Embed(title="Welcome to Xedge Beta", description=CONSENT_TEXT, color=0xF39C12)
-            await member.send(embed=embed, view=ConsentView())
+            await member.send(embed=embed, view=ConsentView(persistent=True))
         except discord.Forbidden:
             pass  # DMs closed; they'll use /start
 
     @app_commands.command(name="start", description="Read & accept the Risk Notice to receive the Sharps role")
     async def start(self, interaction: discord.Interaction):
         embed = discord.Embed(title="Xedge Terms & Conditions", description=CONSENT_TEXT, color=0xF39C12)
-        await interaction.response.send_message(embed=embed, view=ConsentView(), ephemeral=True)
+        await interaction.response.send_message(
+            embed=embed,
+            view=ConsentView(persistent=True),
+            ephemeral=True,
+        )
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Onboarding(bot))
